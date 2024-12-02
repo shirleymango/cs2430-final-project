@@ -5,7 +5,7 @@ import pandas as pd
 
 # Parameters
 input_file = 'data/Scenario A1-ARFF/TimeBasedFeatures-Dataset-15s-VPN.arff'
-n_buckets = 10  # Number of buckets
+n_buckets = 5  # Number of buckets
 alpha = np.ones(n_buckets)  # Dirichlet parameters
 sampling_multiplier = 1.0  # Adjust as needed
 sampling_fraction = 0.5  # Fraction of data to retain in each bucket (50%)
