@@ -4,7 +4,7 @@ import os
 
 # Parameters
 input_file = 'data/Scenario A1-ARFF/TimeBasedFeatures-Dataset-120s-VPN.arff'
-n_buckets = 200  # Number of buckets
+n_buckets = 10  # Number of buckets
 alpha = np.ones(n_buckets)  # Dirichlet parameters
 sampling_multiplier = 1.0  # Adjust as needed
 recent_fraction = 0.5  # Fraction of most recent data to keep in each bucket

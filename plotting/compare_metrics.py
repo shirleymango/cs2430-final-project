@@ -18,7 +18,7 @@ method_names = ['Baseline', 'Method_A', 'Method_B', 'Method_C']  # Replace with 
 # Define the name of the baseline method
 baseline_method = 'Baseline'  # Replace with your actual baseline method name
 
-# Define the output directory for plots and tables
+# Define the output directory for plots
 output_dir = '../plotting/plots'
 os.makedirs(output_dir, exist_ok=True)
 print(f"Output directory set to: {output_dir}")
@@ -166,7 +166,6 @@ def plot_specific_metrics(summary_metrics, output_path):
     2. Average Total Memory Footprint across methods
     3. Average Time across methods
     4. Accuracy vs Time for each method (dual axis plot)
-    5. Average Memory vs Average Accuracy Across Methods
     
     Parameters:
         summary_metrics (pd.DataFrame): DataFrame containing summary metrics per method.
@@ -293,37 +292,37 @@ def plot_specific_metrics(summary_metrics, output_path):
     plt.close()
     print(f"Plot 4 saved: {plot4_path}\n")
     
-    # -----------------------------
-    # Plot 5: Average Memory vs Average Accuracy Across Methods
-    # -----------------------------
+        # -----------------------------
+        # Plot 5: Average Memory vs Average Accuracy Across Methods
+        # -----------------------------
     print("Generating Plot 5: Average Memory vs Average Accuracy Across Methods")
-    
+        
     plt.figure(figsize=(10, 6))
     sns.scatterplot(
-        x='Total_Memory_MB',
-        y='Average_Accuracy',
-        data=summary_metrics,
-        hue='Method',
-        s=100,
-        palette='deep',
-        edgecolor='w'
-    )
+            x='Total_Memory_MB',
+            y='Average_Accuracy',
+            data=summary_metrics,
+            hue='Method',
+            s=100,
+            palette='deep',
+            edgecolor='w'
+        )
     plt.title('Average Memory vs Average Accuracy Across Methods', fontsize=16)
     plt.xlabel('Total Memory Footprint (MB)', fontsize=14)
     plt.ylabel('Average Accuracy', fontsize=14)
-    
-    # Annotate each point with the method name
-    for i in range(summary_metrics.shape[0]):
-        plt.text(
-            summary_metrics['Total_Memory_MB'].iloc[i] + 0.1,  # Slightly offset to the right
-            summary_metrics['Average_Accuracy'].iloc[i],
-            summary_metrics['Method'].iloc[i],
-            horizontalalignment='left',
-            size='medium',
-            color='black',
-            weight='semibold'
-        )
-    
+        
+        # Annotate each point with the method name
+    # for i in range(summary_metrics.shape[0]):
+    #     plt.text(
+    #             summary_metrics['Total_Memory_MB'].iloc[i] + 0.1,  # Slightly offset to the right
+    #             summary_metrics['Average_Accuracy'].iloc[i],
+    #             summary_metrics['Method'].iloc[i],
+    #             horizontalalignment='left',
+    #             size='medium',
+    #             color='black',
+    #             weight='semibold'
+    #         )
+        
     plt.legend(title='Method', fontsize=12, title_fontsize=13)
     plt.tight_layout()
     plot5_path = os.path.join(output_path, 'average_memory_vs_average_accuracy_across_methods.png')
@@ -332,32 +331,9 @@ def plot_specific_metrics(summary_metrics, output_path):
     print(f"Plot 5 saved: {plot5_path}\n")
     
     # -----------------------------
-    # Generate Summary Table
-    # -----------------------------
-    print("Generating Summary Table...")
-    
-    summary_table_path_csv = os.path.join(output_path, 'summary_metrics_table.csv')
-    summary_metrics.to_csv(summary_table_path_csv, index=False)
-    print(f"Summary table saved as CSV: {summary_table_path_csv}")
-    
-    # Generate LaTeX table for write-up
-    summary_table_path_latex = os.path.join(output_path, 'summary_metrics_table.tex')
-    try:
-        with open(summary_table_path_latex, 'w') as f:
-            f.write(summary_metrics.to_latex(index=False, float_format="%.4f"))
-        print(f"Summary table saved as LaTeX: {summary_table_path_latex}\n")
-    except Exception as e:
-        print(f"Error saving LaTeX table: {e}\n")
-    
-    # Optionally, print the table to the console
-    print("Summary Metrics Table:")
-    print(summary_metrics.to_string(index=False))
-    print("\n")
-    
-    # -----------------------------
     # Completion Message
     # -----------------------------
-    print("All specific plots and the summary table have been generated and saved successfully.\n")
+    print("All specific plots have been generated and saved successfully.\n")
 
 # -----------------------------
 # Function Calls
@@ -373,7 +349,7 @@ if __name__ == "__main__":
         # Calculate summary metrics
         summary_metrics = calculate_summary_metrics(avg_metrics)
         
-        # Generate and save specific plots and the summary table
+        # Generate and save specific plots
         plot_specific_metrics(summary_metrics, output_dir)
         
     except Exception as e:
