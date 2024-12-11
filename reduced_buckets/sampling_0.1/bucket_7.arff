@@ -1,0 +1,31 @@
+@RELATION bucket_7
+
+@ATTRIBUTE duration numeric
+@ATTRIBUTE total_fiat numeric
+@ATTRIBUTE total_biat numeric
+@ATTRIBUTE min_fiat numeric
+@ATTRIBUTE min_biat numeric
+@ATTRIBUTE max_fiat numeric
+@ATTRIBUTE max_biat numeric
+@ATTRIBUTE mean_fiat numeric
+@ATTRIBUTE mean_biat numeric
+@ATTRIBUTE flowPktsPerSecond numeric
+@ATTRIBUTE flowBytesPerSecond numeric
+@ATTRIBUTE min_flowiat numeric
+@ATTRIBUTE max_flowiat numeric
+@ATTRIBUTE mean_flowiat numeric
+@ATTRIBUTE std_flowiat numeric
+@ATTRIBUTE min_active numeric
+@ATTRIBUTE mean_active numeric
+@ATTRIBUTE max_active numeric
+@ATTRIBUTE std_active numeric
+@ATTRIBUTE min_idle numeric
+@ATTRIBUTE mean_idle numeric
+@ATTRIBUTE max_idle numeric
+@ATTRIBUTE std_idle numeric
+@ATTRIBUTE class1 {Non-VPN,VPN}
+
+@DATA
+0.0,-1.0,-1.0,-1.0,-1.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.0,-1.0,0.0,0.0,-1.0,0.0,-1.0,0.0,-1.0,0.0,-1.0,0.0,'Non-VPN'
+70879295.0,13.0,10.0,45018141.0,45157574.0,122354.735229759,123455.462478185,2135630.52790506,2010799.47277242,7.0,11238.2748727961,2.0,45018141.0,68748.1037827352,1494816.19712197,10738389.0,23600000.0,45177725.0,18800000.0,7696125.0,22500000.0,45018141.0,19800000.0,'VPN'
+28986915.0,1277.0,1.0,362612.0,28431022.0,111193.8,4820870.5,143160.454301982,11600000.0,2.0,177.1833946455,1.0,28430946.0,2415576.25,8193357.32120619,28986915.0,29000000.0,28986915.0,0.0,28430946.0,28400000.0,28430946.0,0.0,'VPN'

@@ -10,7 +10,7 @@ import tracemalloc
 import csv
 
 # Parameters
-bucket_dir = 'buckets'
+bucket_dir = 'buckets_recent_selection'
 memory_size = 500  # Maximum rehearsal memory size
 rehearsal_memory = []  # Memory for past data
 k = 2  # Number of neighbors for kNN
@@ -20,6 +20,10 @@ metrics = []  # Store computational and memory metrics
 # Initialize kNN classifier
 knn_model = KNeighborsClassifier(n_neighbors=k)
 scaler = StandardScaler()  # Standardize features
+
+# Initialize CPU time tracking
+process = psutil.Process(os.getpid())
+cpu_times_start = process.cpu_times()
 
 # Load and sort buckets to ensure proper sequential processing
 buckets = sorted(
@@ -33,7 +37,6 @@ for bucket_file in buckets:
     print(f"Loading {bucket_file}...")
     
     # Measure loading time and memory
-    process = psutil.Process(os.getpid())
     mem_before = process.memory_info().rss / (1024 * 1024)  # in MB
     start_load = time.time()
     
@@ -61,12 +64,12 @@ for bucket_file in buckets:
     
     # Log metrics for loading
     metrics.append({
-        'Method': 'N/A',  # To be updated if running multiple methods
+        'Method': 'kNN',
         'Bucket': os.path.basename(bucket_file),
         'Operation': 'Load',
         'Time_Sec': load_time,
         'Memory_MB': mem_diff,
-        'CPU_Usage_Percent': process.cpu_percent(interval=None)
+        'CPU_Usage_Percent': None  # Not tracking per-operation CPU usage
     })
 
 print("All buckets loaded.\n")
@@ -89,7 +92,6 @@ for i in range(len(bucket_data) - 1):
     print(f"Processing training on {buckets[i]}...")
     
     # Measure scaling time and memory
-    process = psutil.Process(os.getpid())
     mem_before = process.memory_info().rss / (1024 * 1024)  # in MB
     start_scale = time.time()
     
@@ -107,19 +109,19 @@ for i in range(len(bucket_data) - 1):
     mem_diff = mem_after - mem_before
     
     metrics.append({
-        'Method': 'N/A',  # To be updated if running multiple methods
+        'Method': 'kNN',
         'Bucket': os.path.basename(buckets[i]),
         'Operation': 'Scaling',
         'Time_Sec': scale_time,
         'Memory_MB': mem_diff,
-        'CPU_Usage_Percent': process.cpu_percent(interval=None)
+        'CPU_Usage_Percent': None
     })
     
     # Add the current bucket's data to rehearsal memory
     rehearsal_memory.extend(list(zip(X_current_scaled, y_current)))
     if len(rehearsal_memory) > memory_size:
         rehearsal_memory = rehearsal_memory[-memory_size:]  # Retain the most recent samples
-
+    
     # Combine rehearsal memory for training
     rehearsal_X, rehearsal_y = zip(*rehearsal_memory)
     X_train = np.array(rehearsal_X)
@@ -133,12 +135,12 @@ for i in range(len(bucket_data) - 1):
     mem_train_diff = mem_train_after - mem_after
     
     metrics.append({
-        'Method': 'N/A',  # To be updated if running multiple methods
+        'Method': 'kNN',
         'Bucket': os.path.basename(buckets[i]),
         'Operation': 'Training',
         'Time_Sec': train_time,
         'Memory_MB': mem_train_diff,
-        'CPU_Usage_Percent': process.cpu_percent(interval=None)
+        'CPU_Usage_Percent': None
     })
     
     print(f"Finished training on {buckets[i]}")
@@ -170,22 +172,22 @@ for i in range(len(bucket_data) - 1):
     mem_diff_pred = mem_after_pred - mem_before_pred
     
     metrics.append({
-        'Method': 'N/A',  # To be updated if running multiple methods
+        'Method': 'kNN',
         'Bucket': os.path.basename(buckets[i]),
         'Operation': 'Prediction',
         'Time_Sec': pred_time,
         'Memory_MB': mem_diff_pred,
-        'CPU_Usage_Percent': process.cpu_percent(interval=None)
+        'CPU_Usage_Percent': None
     })
     
     # Log Accuracy as a separate entry
     metrics.append({
-        'Method': 'N/A',  # To be updated if running multiple methods
+        'Method': 'kNN',
         'Bucket': os.path.basename(buckets[i]),
         'Operation': 'Accuracy',
         'Time_Sec': 0,  # Time taken to compute accuracy is negligible
         'Memory_MB': 0,  # Memory change is negligible
-        'CPU_Usage_Percent': process.cpu_percent(interval=None),
+        'CPU_Usage_Percent': None,
         'Accuracy': accuracy  # Additional field for accuracy
     })
     
@@ -196,10 +198,18 @@ overall_end_time = time.time()
 current, peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
+# Calculate CPU time
+cpu_times_end = process.cpu_times()
+cpu_time_user = cpu_times_end.user - cpu_times_start.user
+cpu_time_system = cpu_times_end.system - cpu_times_start.system
+total_cpu_time = cpu_time_user + cpu_time_system
+
 # Calculate and print the average accuracy
 if accuracies:
     average_accuracy = np.mean(accuracies)
-    print(f"\nAverage Accuracy Across All Buckets: {average_accuracy:.4f}")
+    final_accuracy = accuracies[-1]
+    print(f"\nAverage Accuracy Across All Test Buckets: {average_accuracy:.4f}")
+    print(f"Final Accuracy after last training step: {final_accuracy:.4f}")
 else:
     print("\nNo accuracies were computed.")
 
@@ -216,6 +226,7 @@ peak_memory = peak / (1024 * 1024)  # Convert to MB
 
 print(f"Total Continual Learning Time: {total_time:.2f} seconds")
 print(f"Peak Memory Usage: {peak_memory:.2f} MB")
+print(f"Total CPU Time: {total_cpu_time:.2f} seconds")
 
 # Save metrics to a CSV file
 metrics_file = 'continual_learning_metrics.csv'
